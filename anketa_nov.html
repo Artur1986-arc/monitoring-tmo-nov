@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Еженедельный мониторинг — подготовка помещений для ТМО (новый перечень, МПЗЗ и Диспетчерский центр)</title>
+<style>
+  :root{
+    --ink:#1c2a3a; --paper:#f5f6f8; --card:#ffffff; --line:#d6dbe2;
+    --locked:#eceff3; --locktext:#5b6572; --accent:#0b5e36; --accent-soft:#e5f2ea;
+    --danger:#8a2b2b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.5 "PT Sans","Segoe UI",Arial,sans-serif;color:var(--ink);background:var(--paper)}
+  header{background:var(--ink);color:#fff;padding:18px 28px}
+  header{text-align:center;padding:22px 28px}
+  header h1{margin:0;font-size:26px;font-weight:700;letter-spacing:.2px}
+  header p{margin:6px 0 0;font-size:14px;opacity:.75}
+  main{width:100%;margin:0 auto;padding:20px 24px 60px}
+  .steps{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+  .step{flex:1 1 320px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:14px 16px}
+  .step{text-align:center}
+  .step .tag{display:block;font-size:14px;font-weight:700;letter-spacing:.3px;color:var(--accent);margin-bottom:8px}
+  select{width:100%;padding:9px 10px;font:inherit;border:1px solid var(--line);border-radius:6px;background:#fff}
+  select:focus,input:focus{outline:2px solid var(--accent);outline-offset:0}
+  .hint{font-size:12.5px;color:var(--locktext);margin:10px 2px 18px}
+  .tablewrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:8px;display:none}
+  table{border-collapse:collapse;width:100%;font-size:12.5px;table-layout:fixed}
+  th,td{border:1px solid var(--line);padding:6px 5px;vertical-align:top;text-align:center;min-width:0;word-break:break-word}
+  thead th{background:#ffffff;color:#000000;font-weight:700;white-space:normal;font-size:11.5px}
+  thead .grp{background:#ffffff;color:#000000;font-size:12px;vertical-align:middle;text-align:center}
+  thead .grp.sub{height:10px;padding:2px}
+  thead th.num{background:#f2f4f7;color:#000;font-size:10px;padding:2px 4px;font-weight:700}
+  tbody td{background:#ffffff;color:#000000}
+  td.name,th.name{text-align:left;min-width:220px}
+  td input{width:100%;border:none;background:transparent;font:inherit;font-size:12px;padding:2px;text-align:center}
+  td.note{background:#fff9d6}
+  td.note textarea{width:100%;border:none;background:transparent;font:inherit;font-size:11px;padding:2px;resize:vertical;overflow:auto;height:160px;min-height:60px;text-align:left;display:block}
+  td.name textarea{width:100%;border:none;background:transparent;font:inherit;font-size:11px;padding:2px;resize:none;overflow:hidden;min-height:40px;text-align:left;display:block;background:var(--locked);color:var(--locktext);border-radius:4px}
+  td.note.filled textarea{background:#a8d8b0}
+  td.lock input{background:var(--locked);color:var(--locktext);border-radius:4px}
+  td.edit input{background:#ffe066;border-radius:4px}
+  td.edit.filled input{background:#a8d8b0}
+  td.edit{background:#fff9d6}
+  td.edit.filled{background:#fbfdfc}
+  td.err{background:#f3c1c1 !important}
+  td.lock.note textarea{background:var(--locked);color:var(--locktext);text-align:left}
+  .actions{margin:18px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .filler{margin:14px 0 0;display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .filler-label{font-weight:700;font-size:15px}
+  button{font:inherit;font-weight:700;border:none;border-radius:6px;padding:10px 18px;cursor:pointer}
+  .btn-add{background:var(--accent);color:#fff}
+  .btn-xls{background:var(--ink);color:#fff}
+  .btn-xls.ready{background:var(--accent)}
+  .btn-clear{background:transparent;color:var(--danger);border:1px solid var(--danger)}
+  .bag{margin:6px 0 18px}
+  .bag .row{display:flex;align-items:center;gap:8px;background:var(--accent-soft);border:1px solid #bfdcc9;border-radius:6px;padding:6px 10px;margin:4px 0;font-size:13px}
+  .bag .row b{font-weight:700}
+  .bag .del{margin-left:auto;background:none;border:none;color:var(--danger);cursor:pointer;font-size:13px;text-decoration:underline;padding:0}
+  footer{width:100%;margin:0 auto;padding:0 24px 40px;font-size:12px;color:var(--locktext)}
+  @media print{header{background:#fff;color:#000;border-bottom:2px solid #000}.actions,.steps{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Еженедельный мониторинг — подготовка помещений для ТМО (новый перечень, МПЗЗ и Диспетчерский центр)</h1>
+  <p>Национальный проект «Продолжительная и активная жизнь» · перечень «Подготовка помещений для ТМО (Новые)» · Республика Татарстан · ред. от 17.11.2026</p>
+</header>
+<main>
+  <div class="steps">
+    <div class="step">
+      <span class="tag">Выберите наименование медицинской организации</span>
+      <select id="selOrg"><option value="">— выберите медицинскую организацию —</option></select>
+    </div>
+    <div class="step">
+      <span class="tag">Выберите Объект</span>
+      <select id="selObj" disabled><option value="">— сначала выберите организацию —</option></select>
+    </div>
+  </div>
+  <p class="hint"><b>Серые ячейки</b> заполнены заранее и закрыты для изменения. <b>Жёлтые ячейки</b> (лимиты — цифры; источник финансирования и проектная организация — текст; процент — до 100; даты — в формате ДД.ММ.ГГГГ; согласования — выбор из списка «да / нет / на согле») заполняет ответственное лицо организации — после заполнения ячейка становится <b>зелёной</b>.</p>
+
+  <div class="tablewrap" id="wrap">
+    <table id="tbl">
+      <thead id="thead"></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <p class="hint" id="saveHint" style="display:none"><b>Отчет можно сохранить только после заполнения всех жёлтых ячеек.</b></p>
+
+  <div class="filler">
+    <label class="filler-label" for="inpFiller">Заполнившее лицо медицинской организации (ФИО и должность):</label>
+    <input type="text" id="inpFiller" placeholder="Введите должность и ФИО" style="flex:1;width:100%;padding:6px 10px;border:2px solid #ffe066;background:#fff9d6;border-radius:6px;font-size:15px">
+  </div>
+
+  <div class="actions" id="actions" style="display:none">
+    <button class="btn-xls" id="btnXls" disabled title="Отчет можно сохранить только после заполнения всех жёлтых ячеек">Сохранить отчет</button>
+    <button class="btn-clear" id="btnClear">Сбросить</button>
+  </div>
+
+  <div class="bag" id="bag"></div>
+</main>
+<footer>После заполнения всех объектов нажмите «Сохранить отчет» и направьте полученный файл по адресу, указанному в запросе Министерства здравоохранения Республики Татарстан.</footer>
+
+<script>
+// master: [№, org, адрес, площадь, всего, СМР, ПИР, источник, проектная орг, состояние %, дата завершения ПИР, согласование РЦ, согласование ФБУЗ, демонтаж %, общестрой %, отделка %, дата завершения СМР, подрядчик, акт готовности, поставка, монтаж, ввод, примечание, вид оборудования]
+var MASTER=[["1","1","ГАУЗ \"Бугульминская ЦРБ\"","г. Бугульма, ул. Октябрьская, д. 20 (поликлиника)","42.66","","","","","ООО \"Медтехатомпроект\"","1","26.10.2026","на согле","на согле","1","1","0.2","","","","ГК заключен 18.09.2026 г, поставка до 01.12.2026","","","взамен существующего,  в поликлинике, остается вопрос по свинцовой двери","Аппарат рентгеновский маммографический цифровой или аналоговый (МПЗЗ)","Оборудование, поставляемое в рамках МПЗЗ"],
+["2","2","ГАУЗ \"Сармановская ЦРБ\"","пгт. Джалиль, ул. Лесная, д. 4","25.9","","","","","ООО \"Вера Групп\"","1","06.10.2026","на согле","на согле","1","1","1","30.12.2025","ООО \"Альянс-СТРОЙ\"","","ГК заключен 18.09.2026 г, поставка до 01.12.2026","","","новое, помещение готово в рамках капитального ремонта , ожидается поставка 27.11.","Аппарат рентгеновский маммографический цифровой или аналоговый (МПЗЗ)","Оборудование, поставляемое в рамках МПЗЗ"],
+["3","3","ГАУЗ \"Госпиталь для ветеранов войн\" г.Набережные Челны","г. Набережные Челны, ул. Набережная им. Габдуллы Тукая, д. 39","18.3","","","","","ООО \"Строй Сити\"","1","","да","да","1","1","1","","","","ГК заключен 18.09.2026 г, поставка до 01.12.2026","","","Помещение готово, акт готовности помещения направлен поставщику от 14.10.26г. , ожидается поставка 27.11.","Аппарат рентгеновский маммографический цифровой или аналоговый (МПЗЗ)","Оборудование, поставляемое в рамках МПЗЗ"],
+["4","4","ГАУЗ \"Тюлячинская ЦРБ\"","с. Тюлячи, ул. Ленина, д. 35","18","","","","","Медпроект","1","11.11.2026","на согле","","","","","","","","ГК заключен 18.09.2026 г, поставка до 01.12.2026","","","новое, совместно с флюорографом. СМР не требуется","Аппарат рентгеновский маммографический цифровой или аналоговый (МПЗЗ)","Оборудование, поставляемое в рамках МПЗЗ"],
+["5","1","ГАУЗ \"Клиническая больница № 2\" г. Казани","г. Казань, ул. Н.Столярова, д. 39","41.4","","","","ОМС+ВБ","ООО \"Вера Групп\"","1","завершено","","да","0.25","0.25","","","","","ГК заключен 14.09.2026 г, поставка до 01.12.2026","","","новое","Аппарат рентгеновский для флюорографии легких цифровой или аналоговый (МПЗЗ)","Оборудование, поставляемое в рамках МПЗЗ"],
+["6","2","ГАУЗ \"Госпиталь для ветеранов войн\" г. Набережные Челны","г. Набережные Челны, ул. Набережная им. Габдуллы Тукая, д. 39","20.5","","","","","ООО \"Камстрой-проект\"","1","21.10.2026","да","на согле","1","1","1","10.11.2026","Строй Сити","","ГК заключен 14.09.2026 г, поставка до 01.12.2026","","","СМР завершен, ждут поставки оборудования.","Аппарат рентгеновский для флюорографии легких цифровой или аналоговый (МПЗЗ)","Оборудование, поставляемое в рамках МПЗЗ"],
+["7","1","ГАУЗ \"Городская поликлиника № 21\" г. Казани","ул. Оренбургский тракт, д. 95","43.74","","","","","ООО \"Вера Групп\"","0.95","12.11.2026","","","","","","","","","ГК заключен 29.09.2026 г, поставка до 01.12.2026","","","взамен существующего.","Аппарат рентгеновский стационарный для рентгенографии цифровой (МПЗЗ)","Оборудование, поставляемое в рамках МПЗЗ"],
+["8","2","ГАУЗ \"Детская республиканская клиническая больница МЗ РТ\"","г. Казань, ул. Хайдара Бигичева, здание 20","65.62","","","","РКМ","СтройСити","1","","да","","1","","","","","","ГК заключен 29.09.2026 г, поставка до 01.12.2026","","","взамен существующего, работы ведутся","Аппарат рентгеновский стационарный для рентгенографии цифровой (МПЗЗ)","Оборудование, поставляемое в рамках МПЗЗ"],
+["9","3","ГАУЗ \"Детская городская больница № 1\"","г. Казань, ул. Декабристов, д. 125а","31.5","","","","","Протон","0","","","","","","","","","","ГК заключен 29.09.2026 г, поставка до 01.12.2026","","","взамен существующего. Ждут письмо от \"Протона\".имеется проблемный вопрос по поводу рельса аппарат.Небольшой СМР требуется.","Аппарат рентгеновский стационарный для рентгенографии цифровой (МПЗЗ)","Оборудование, поставляемое в рамках МПЗЗ"],
+["10","1","Филиал ГАУЗ \"РКПД\" - Альметьевский противотуберкулезный диспансер\"","г. Альметьевск, ул. Советская, д. 156","19.1","","","","","МедТехАтом","0.9","","","","1","0.9","0.9","","","","до 19.10.2026","","","взамен существующего, ГК заключен 21.07.2026 , заказали видеонаблюдние  и свинцовую дверь (поставка ожидается 20.11.). Оборудование поставлено.","Аппарат рентгеновский для флюорографии легких цифровой или аналоговый (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"],
+["11","1","ГАУЗ \"Госпиталь для ветеранов войн\" г. Казани","г. Казань, Республика Татарстан, г. Казань, ул. Исаева, д. 5","59.51","","","","","","","","","","1","1","1","завершено","","","","","","взамен существующего.  Заключение ГК 25.11.2026, придется переделать, так как готовили помещение под другой аппарат","Аппарат рентгеновский стационарный (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"],
+["12","1","ГАУЗ \"Городская клиническая больница № 7 им. М.Н.Садыкова\"","г. Казань, Республика Татарстан, ул. Маршала Чуйкова, д. 54","34.8","","","","","ООО \"Вера Групп\"","1","10.10.2026","нет","да","1","1","1","15.10.2026","своими силами","15.10.2026","10.10.2026","20.10.2026","20.10.2026","Монтаж и обучение проведены.","Конусно-лучевой компьютерный томограф (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"],
+["13","2","ГАУЗ \"Республиканская клиническая больница МЗ РТ\"","г. Казань, ул. Оренбургский тракт, д. 138, корп А","49.2","","","","","ООО \"МЕДТЕХАТОМПРОЕКТ\"","1","16.10.2026","нет","нет","не нужны","0","0","","своими силами","30.11.2026 (если двери не нужно будет менять)","","","","взамен существующего, проект отправлен на доработку есть замечания от Рентгенцентра","Конусно-лучевой компьютерный томограф (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"],
+["14","3","ГАУЗ \"Детская республиканская клиническая больница МЗ РТ\"","г. Казань, ул. Оренбургский тракт, д. 140","38.6","","","","РКМ","ООО \"Вера Групп\"","1","","да","","","","","","","","","","","взамен существующего, необходимо усиление 2 стен, ставни и двреь","Конусно-лучевой компьютерный томограф (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"],
+["15","4","ГАУЗ \"Городская больница № 5\" г. Набережные Челны","г. Набережные Челны, проспект им. Вахитова, д. 13","30.55","","нет","","внебюджетный","Медпроект +","0.9","28.10.2026","нет","нет","1","1","1","завершено","нет","","15.10.2026","23-24.10.2026","","Монтаж и обучение проведены.","Конусно-лучевой компьютерный томограф (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"],
+["16","1","ГАУЗ \"Городская клиническая больница № 7 им. М.Н.Садыкова\"","г. Казань, ул. Маршала Чуйкова, д. 54","47.8","","","","","ООО \"Вера Групп\"","1","19.10.2026","нет","да","1","1","1","19.10.2026","своими силами","20.10.2026","16.11.2026","14.12.2026","14.12.2026","взамен существующего","Томограф рентгеновский компьютерный (128 срезов) (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"],
+["17","1","ГАУЗ \"Городская клиническая больница № 7 им. М.Н.Садыкова\"","г. Казань, ул. Маршала Чуйкова, д. 54","","","","","","ООО \"Вира-Групп\"","","23.11.2026","","","новый аппарат в операционные оперблока. Аппарат передвижной, планируется привязать с кабинетом у которого есть рентгензащита","","","","","","ГК заключен 27.10.2026 г, поставка до 01.12.2026","","","","С-дуга (мобильный) (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"],
+["18","2","ГАУЗ \"Республиканская клиническая больница МЗ РТ\"","г. Казань, ул. Оренбургский тракт, д. 138, корп А","49.2","","","","","ООО \"МЕДТЕХАТОМПРОЕКТ\"","не требуется","","нет","нет","взамен существующего, аппарат передвижной, планируется привязать с кабинетом у которого есть рентгензащита","","","","","","ГК заключен 27.10.2026 г, поставка до 01.12.2026","","","","С-дуга (мобильный) (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"],
+["19","3","ГАУЗ \"Детская республиканская клиническая больница МЗ РТ\"","г. Казань, ул. Оренбургский тракт, д. 140","25","","","","","","","","","","взамен существующего, аппарат передвижной, планируется привязать с кабинетом у которого есть рентгензащита","","","","","","ГК заключен 27.10.2026 г, поставка до 01.12.2026","","","","С-дуга (мобильный) (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"],
+["20","4","ГАУЗ \"Альметьевская районная многопрофильная больница\"","Альметьевский район, г. Альметьевск, ул. Радищева, д. 67","18","","","","","ООО \"Вира-Групп\"","","","","","взамен существующего, аппарат передвижной, планируется привязать с кабинетом у которого есть рентгензащита","","","","","","ГК заключен 27.10.2026 г, поставка до 01.12.2026","","","","С-дуга (мобильный) (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"],
+["21","5","ГАУЗ \"Нижнекамская центральная районная многопрофильная больница\"","Нижнекамский район, г. Нижнекамск, ул. Ахтубинская, д. 13","33.4","","","","","","","","","","взамен существующего, аппарат передвижной, планируется привязать с кабинетом у которого есть рентгензащита","","","","","","ГК заключен 27.10.2026 г, поставка до 01.12.2026","","","","С-дуга (мобильный) (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"],
+["22","6","ГАУЗ \"Городская клиническая больница № 12\" г. Казани","г. Казань, ул. Лечебная, д. 7","51","","","","","","","","","","взамен существующего, аппарат передвижной, планируется привязать с кабинетом у которого есть рентгензащита","","","","","","ГК заключен 27.10.2026 г, поставка до 01.12.2026","","","","С-дуга (мобильный) (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"],
+["23","7","ГАУЗ \"Городская клиническая больница № 16\"","г. Казань, ул. Гагарина, д. 121","","","","","","ООО \"МедЭлит\"","","","","","взамен существующего, аппарат передвижной, планируется привязать с кабинетом у которого есть рентгензащита","","","","","","ГК заключен 27.10.2026 г, поставка до 01.12.2026","","","","С-дуга (мобильный) (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"],
+["24","8","ГАУЗ \"Больница скорой медицинской помощи им. Р.С.Акчурина\"","г. Набережные Челны, Набережночелнинский проспект, д. 18","50","","","","","","","","","","взамен существующего, аппарат передвижной, планируется привязать с кабинетом у которого есть рентгензащита","","","","","","ГК заключен 27.10.2026 г, поставка до 01.12.2026","","","","С-дуга (мобильный) (Диспетчерский центр)","Оборудование, поставляемое за счет Диспетчерского центра Минздрава Татарстана"]];
+var EDIT_COLS=[5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,21,22,23]; // заполняют организации: лимит (Всего, СМР, ПИР), источник финансирования, текущее состояние, дата завершения проектирования, согласования РЦ и ФБУЗ // первые 13 столбцов закрываются
+var SHOW=[4,5,6,8,9,10,11,12,13,14,15,16,17]; // видимые колонки: лимит, проектирование, СМР
+var HEAD2=[null,null,null,null,null,'Всего','СМР','ПИР',null,'Проектная организация','текущее состояние (%)','дата завершения','Согласование с Рентгенцентром (да/нет)','Согласование с ФБУЗ (да/нет)','демонтажные работы (%)','общестроительные работы (%)','отделочные работы (%)','дата завершения','Подрядная организация',null,null,null,null,null];
+var HEAD1=[['№ п/п',2],['Наименование учреждения',1],['Фактический адрес поставки',1],['Площадь ремонта (кв.м.)',1],['Лимит финансирования (тыс.руб.)',3],['Источник финансирования (РКМ, хозспособом, внебюджетные, спонсоры и др.)',1],['Проектирование',5],['Строительно-монтажные работы',5],['Дата подписания Акта готовности помещения',1],['Поставка оборудования (дата)',1],['Завершение монтажа оборудования (дата)',1],['Ввод в эксплуатацию (дата)',1],['Примечание (описание хода работ, количество рабочих)',1]];
+var selOrg=document.getElementById('selOrg'),selObj=document.getElementById('selObj');
+(function fillOrgs(){
+  var seen={},order=[],disp={};
+  MASTER.forEach(function(r){ var full=norm(r[2]), k=full.replace(/\s+/g,''); if(!seen[k]){seen[k]=true;order.push(k);disp[k]=full;} });
+  order.forEach(function(k){ var o=document.createElement('option'); o.value=k;o.textContent=disp[k]; selOrg.appendChild(o); });
+})();
+function norm(s){return String(s).replace(/\s*\(2 шт\.\)\s*$/,'').trim();}
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+selOrg.addEventListener('change',function(){
+  selObj.innerHTML=''; selObj.disabled=!selOrg.value;
+  if(!selOrg.value){selObj.appendChild(new Option('— сначала выберите организацию —',''));hideTable();return;}
+  selObj.appendChild(new Option('— выберите объект —',''));
+  MASTER.forEach(function(r){
+    if(norm(r[2]).replace(/\s+/g,'')===selOrg.value){
+      var o=document.createElement('option');
+      o.value=r[0]; o.textContent=(r[25].indexOf('МПЗЗ')>=0?'МПЗЗ · ':'Диспетчерский центр · ')+r[24]+' · '+r[2];
+      selObj.appendChild(o);
+    }
+  });
+});
+selObj.addEventListener('change',function(){ if(selObj.value){showTable()} else {hideTable()} });
+function hideTable(){document.getElementById('wrap').style.display='none';document.getElementById('actions').style.display='none';}
+function showTable(){buildTable();document.getElementById('wrap').style.display='block';document.getElementById('actions').style.display='flex';document.getElementById('saveHint').style.display='block';document.querySelectorAll('#tbody td.name textarea').forEach(growTA);updSaveBtn();}
+var COLW=[2.5,2,8,7,3,4.2,4.2,4.2,4.5,3.5,3,5,4.4,3.5,3.5,3.5,5,4,3.5,4.5,4.5,4.5,4.5,5];
+function buildTable(){
+  var cg='<colgroup>';
+  COLW.forEach(function(w){ cg+='<col style="width:'+w+'%">'; });
+  cg+='</colgroup>';
+  var th1='<tr>',th2='<tr>';
+  var singleTop={0:'№ п/п',1:'№ п/п/',2:'Наименование учреждения',3:'Фактический адрес поставки',4:'Площадь ремонта (кв.м.)',8:'Источник финансирования (РКМ, хозспособом, внебюджетные, спонсоры и др.)',19:'Дата подписания Акта готовности помещения',20:'Поставка оборудования (дата)',21:'Завершение монтажа оборудования (дата)',22:'Ввод в эксплуатацию (дата)',23:'Примечание (описание хода работ, количество рабочих)'};
+  var GROUPS={5:['Лимит финансирования (тыс.руб.)',3],9:['Проектирование',5],14:['Строительно-монтажные работы',5]};
+  for(var c=0;c<24;c++){
+    if(c>=0&&c<=3){ th1+='<th class="grp" rowspan="2">'+esc(singleTop[c])+'</th>'; continue; }
+    if(singleTop[c]!==undefined){ th1+='<th class="grp" rowspan="2">'+esc(singleTop[c])+'</th>'; continue; }
+    else if(GROUPS[c]){ th1+='<th class="grp" colspan="'+GROUPS[c][1]+'">'+esc(GROUPS[c][0])+'</th>'; }
+    if(HEAD2[c]){ th2+='<th>'+esc(HEAD2[c])+'</th>'; }
+  }
+  var th3='<tr>';
+  for(var c=0;c<24;c++){ th3+='<th class="num">'+(c+1)+'</th>'; }
+  document.getElementById('thead').innerHTML=th1+'</tr>'+th2+'</tr>'+th3+'</tr>';
+  var tbl=document.getElementById('tbl');
+  var oldCg=tbl.querySelector('colgroup'); if(oldCg) oldCg.remove();
+  tbl.insertAdjacentHTML('afterbegin',cg);
+  var row=MASTER.filter(function(r){return r[0]==selObj.value})[0];
+  var MTEXT=null;
+  if(+row[0]>=20){
+    var t14=String(row[14]||'');
+    if(t14.length>20 && !/^[\d.,]+$/.test(t14) && String(row[15]||'')==='' && String(row[16]||'')==='' && String(row[17]||'')==='' && String(row[18]||'')==='') MTEXT=t14;
+  }
+  var html='<tr>';
+  for(var c=0;c<24;c++){
+    var v=row[c]==null?'':row[c];
+    var locked=EDIT_COLS.indexOf(c)<0;
+    var disp=v;
+    if(PCT_COLS.indexOf(c)>=0) disp=pctShow(v);
+    if(DATE_COLS.indexOf(c)>=0&&v==='') disp='00.00.0000';
+    if(MTEXT&&c===14){
+      html+='<td class="lock note" colspan="5" data-col="14"><textarea readonly data-col="14" rows="2">'+esc(MTEXT)+'</textarea></td>';
+      continue;
+    }
+    if(MTEXT&&c>14&&c<=18) continue;
+    if(c===23){
+      html+='<td class="'+(locked?'lock':'edit')+' note" data-col="'+c+'"><textarea '+(locked?'readonly ':'')+'data-col="'+c+'" rows="1">'+esc(v)+'</textarea></td>';
+    } else if(SELECT_COLS.indexOf(c)>=0){
+      var opts=['','да','нет','на согле'];
+      if(v!==''&&opts.indexOf(v)<0) opts.push(v);
+      html+='<td class="edit" data-col="'+c+'"><select data-col="'+c+'" data-raw="'+esc(v)+'">'+opts.map(function(o){return '<option'+(o===v?' selected':'')+'>'+esc(o)+'</option>';}).join('')+'</select></td>';
+    } else if((c===2||c===3||c===20)&&locked){
+      html+='<td class="lock name" data-col="'+c+'"><textarea readonly data-col="'+c+'">'+esc(v)+'</textarea></td>';
+    } else {
+      html+='<td class="'+(locked?'lock':'edit')+(c===1?' name':'')+'"><input '+(locked?'readonly':'')+' data-col="'+c+'" data-raw="'+esc(v)+'" value="'+esc(disp)+'"></td>';
+    }
+  }
+  html+='</tr>';
+  document.getElementById('tbody').innerHTML=html;
+  document.querySelectorAll('#tbody td.name textarea').forEach(growTA);}
+function growTA(ta){
+  ta.style.height='auto';
+  ta.style.height=Math.max(ta.scrollHeight, 40)+'px';
+}
+var PCT_COLS=[10,14,15,16];
+var NUM_INP_COLS=[5,6,7];
+var SELECT_COLS=[12,13];
+function pctShow(v){
+  var s=String(v).trim();
+  if(!/^[\d.,]+$/.test(s)) return v;
+  var n=parseFloat(s.replace(',','.'));
+  if(isNaN(n)) return v;
+  var p=(n<=1.5?n*100:n);
+  return (Math.round(p*10)/10).toString().replace('.',',')+'%';
+}
+function pctRaw(txt){
+  var s=String(txt).trim().replace('%','').replace(' ','').replace(',','.');
+  if(s===''||isNaN(parseFloat(s))) return txt;
+  var n=parseFloat(s);
+  return n>1.5?Math.round(n)/100:String(n);
+}
+document.addEventListener('change',function(e){
+  var inp=e.target;
+  if(inp.matches&&inp.matches('#tbody td.edit input')&&DATE_COLS.indexOf(+inp.dataset.col)>=0){ strictDate(inp); inp.dataset.autofill=''; }
+  if(inp.matches&&inp.matches('#tbody td.edit input')&&PCT_COLS.indexOf(+inp.dataset.col)>=0) sanitizePct(inp,true);
+  if(inp.matches&&inp.matches('#tbody td.edit input')&&NUM_INP_COLS.indexOf(+inp.dataset.col)>=0) sanitizeNum(inp,true);
+  if(inp.matches&&inp.matches('#tbody select')){ inp.closest('td').classList.add('filled'); updSaveBtn(); }
+});
+document.addEventListener('input',function(e){
+  var inp=e.target;
+  if(inp.matches&&inp.matches('#tbody td.edit input')){
+    var isDate=DATE_COLS.indexOf(+inp.dataset.col)>=0;
+    if(isDate){
+      inp.dataset.autofill='';
+    } else {
+      if(PCT_COLS.indexOf(+inp.dataset.col)>=0) sanitizePct(inp,false);
+      if(NUM_INP_COLS.indexOf(+inp.dataset.col)>=0) sanitizeNum(inp,false);
+    }
+  }
+  if(NUM_INP_COLS.indexOf(+inp.dataset.col)>=0){ var td5x=document.querySelector('#tbody input[data-col="5"]'); if(td5x){ td5x=td5x.closest('td'); td5x.classList.toggle('err',limitErr()); } }
+  updSaveBtn();
+});
+function limitErr(){
+  function gv(c){var el=document.querySelector('#tbody input[data-col=\"'+c+'\"]');if(!el)return null;var v=String(el.value||'').replace(',','.').trim();if(v===''||isNaN(parseFloat(v)))return null;return parseFloat(v);}
+  var a=gv(5),b=gv(6),c2=gv(7);
+  if(a===null||b===null||c2===null)return false;
+  return Math.abs(a-(b+c2))>1e-9;
+}
+function updSaveBtn(){
+  var ok=true;
+  var td5=document.querySelector('#tbody input[data-col="5"]');
+  var terr=limitErr();
+  if(td5) td5=td5.closest('td');
+  if(td5) td5.classList.toggle('err',terr);
+  if(terr) ok=false;
+  document.querySelectorAll('#tbody td.edit input, #tbody select, #tbody td.edit.note textarea').forEach(function(i){
+    var v=i.value.trim();
+    if(v===''||/^0{2}\.0{2}\.0{4}$/.test(v)) ok=false;
+  });
+  if(document.getElementById('inpFiller').value.trim().length<10) ok=false;
+  document.getElementById('btnXls').disabled=!ok;
+  document.getElementById('btnXls').classList.toggle('ready',ok);
+}
+function sanitizeDate(inp){/* маска обрабатывается в maskDateKey */}
+var DATE_MAP=[0,1,3,4,6,7,8,9];
+function setCaret(inp,i){ inp.setSelectionRange(i,i); }
+function handleDateEnter(inp){
+  var touched=inp.dataset.autofill!=='1';
+  if(!/^(\d{2})\.(\d{2})\.(\d{4})$/.test(inp.value)){
+    if(touched){ inp.dispatchEvent(new Event('input',{bubbles:true})); return; }
+    var nn=new Date();function pdd(x){return (x<10?'0':'')+x;}
+    inp.value=pdd(nn.getDate())+'.'+pdd(nn.getMonth()+1)+'.'+nn.getFullYear();
+  }
+  inp.dataset.autofill='';
+  inp.closest('td').classList.add('filled');
+  inp.dispatchEvent(new Event('input',{bubbles:true}));
+  var edins=Array.prototype.slice.call(document.querySelectorAll('#tbody td.edit input, #tbody select, #tbody td.edit.note textarea'));
+  var kk=edins.indexOf(inp);
+  if(kk>=0&&kk<edins.length-1) edins[kk+1].focus();
+}
+document.addEventListener('keydown',function(e){
+  var t0=e.target;
+  var isEd=t0&&(t0.matches&&(t0.matches('#tbody td.edit input')||t0.matches('#tbody select')||t0.matches('#tbody td.edit.note textarea')));
+  if(e.key==='Enter'&&isEd){
+    e.preventDefault();
+    if(t0.matches('#tbody td.edit input')&&DATE_COLS.indexOf(+(t0.dataset&&t0.dataset.col))>=0){
+      if(!/^(\d{2})\.(\d{2})\.(\d{4})$/.test(t0.value)){
+        var nn=new Date();function pd3(x){return (x<10?'0':'')+x;}
+        t0.value=pd3(nn.getDate())+'.'+pd3(nn.getMonth()+1)+'.'+nn.getFullYear();
+      }
+      t0.dataset.autofill='';
+      if(!isValidDateStr(t0.value)){ t0.value=''; t0.closest('td').classList.remove('filled'); }
+      else { t0.closest('td').classList.add('filled'); }
+      t0.dispatchEvent(new Event('input',{bubbles:true}));
+    }
+    if(t0.blur) t0.blur();
+    var edins0=Array.prototype.slice.call(document.querySelectorAll('#tbody td.edit input, #tbody select, #tbody td.edit.note textarea'));
+    var k0=edins0.indexOf(t0);
+    if(k0>=0&&k0<edins0.length-1){ edins0[k0+1].focus(); }
+    else if(!document.getElementById('btnXls').disabled) document.getElementById('btnXls').click();
+    return;
+  }
+  if(e.key==='Enter'&&e.target&&e.target.matches&&e.target.matches('#tbody td.edit input')&&DATE_COLS.indexOf(+e.target.dataset.col)>=0){ handleDateEnter(e.target); return; }
+  if(e.key==='Enter'&&e.target&&e.target.tagName==='TEXTAREA'&&e.target.closest('#tbody td.note')){
+    e.preventDefault();
+    e.target.closest('td').classList.add('filled');
+    e.target.dispatchEvent(new Event('input',{bubbles:true}));
+    return;
+  }
+  if(e.key==='Enter'&&e.target&&e.target.matches&&e.target.matches('#tbody td.edit input')&&PCT_COLS.indexOf(+e.target.dataset.col)>=0){
+    e.preventDefault();
+    if(e.target.value.trim()!==''){
+      e.target.closest('td').classList.add('filled');
+      e.target.dispatchEvent(new Event('input',{bubbles:true}));
+      var edins=Array.prototype.slice.call(document.querySelectorAll('#tbody td.edit input, #tbody select, #tbody td.edit.note textarea'));
+      var k=edins.indexOf(e.target);
+      if(k>=0&&k<edins.length-1) edins[k+1].focus();
+    }
+    return;
+  }
+  if(e.key==='Enter'){
+    var act=document.activeElement;
+    var edins=Array.prototype.slice.call(document.querySelectorAll('#tbody td.edit input, #tbody select, #tbody td.edit.note textarea'));
+    var k=edins.indexOf(act);
+    if(act&&act.blur) act.blur();
+    if(k>=0&&k<edins.length-1){ edins[k+1].focus(); }
+    else if(!document.getElementById('btnXls').disabled) document.getElementById('btnXls').click();
+  }
+  var inp=e.target;
+  if(!inp.matches||!inp.matches('#tbody td.edit input')||DATE_COLS.indexOf(+inp.dataset.col)<0) return;
+  if(e.key==='Enter'){
+    e.preventDefault();
+    var touched=inp.dataset.autofill!=='1';
+    if(!/^(\d{2})\.(\d{2})\.(\d{4})$/.test(inp.value)){
+      if(touched){ inp.dispatchEvent(new Event('input',{bubbles:true})); return; }
+      var n=new Date();function pd(x){return (x<10?'0':'')+x;} inp.value=pd(n.getDate())+'.'+pd(n.getMonth()+1)+'.'+n.getFullYear();
+    }
+    inp.dataset.autofill='';
+    inp.closest('td').classList.add('filled');
+    inp.dispatchEvent(new Event('input',{bubbles:true}));
+    var edins=Array.prototype.slice.call(document.querySelectorAll('#tbody td.edit input, #tbody select, #tbody td.edit.note textarea'));
+    var k=edins.indexOf(inp);
+    if(k>=0&&k<edins.length-1) edins[k+1].focus();
+    return;
+  }
+  if(e.key.length===1&&!/[0-9]/.test(e.key)){ e.preventDefault(); return; }
+  var v=/^\d{2}\.\d{2}\.\d{4}$/.test(inp.value)?inp.value:'00.00.0000';
+  function apply(chars,caret){ inp.value=chars.join(''); setCaret(inp,caret); inp.dispatchEvent(new Event('input',{bubbles:true})); }
+  if(e.key>='0'&&e.key<='9'){
+    var s=inp.selectionStart, chars=v.split('');
+    var slot=-1;
+    for(var k=0;k<DATE_MAP.length;k++){ if(DATE_MAP[k]>=s){slot=k;break;} }
+    if(slot<0) slot=DATE_MAP.length-1;
+    chars[DATE_MAP[slot]]=e.key;
+    apply(chars,DATE_MAP[slot]+1);
+    e.preventDefault();
+  } else if(e.key==='Backspace'){
+    var s2=inp.selectionStart, chars2=v.split('');
+    var prev=-1;
+    for(var k2=DATE_MAP.length-1;k2>=0;k2--){ if(DATE_MAP[k2]<s2){prev=k2;break;} }
+    if(prev>=0){ chars2[DATE_MAP[prev]]='0'; apply(chars2,DATE_MAP[prev]+1); }
+    e.preventDefault();
+  } else if(e.key.length===1&&!e.ctrlKey&&!e.metaKey&&!e.altKey){
+    e.preventDefault();
+  }
+});
+document.addEventListener('focusin',function(e){
+  var inp=e.target;
+  if(inp.matches&&inp.matches('#tbody td.edit input')&&DATE_COLS.indexOf(+inp.dataset.col)>=0){
+    if(inp.value.trim()===''){
+      var n=new Date();
+      function p(x){return (x<10?'0':'')+x;}
+      inp.value=p(n.getDate())+'.'+p(n.getMonth()+1)+'.'+n.getFullYear();
+      inp.dataset.autofill='1';
+    } else if(!/^\d{2}\.\d{2}\.\d{4}$/.test(inp.value)){
+      var tok=(inp.value.match(/\d{2}\.\d{2}\.\d{4}/)||[inp.value])[0];
+      inp.value=tok;
+      inp.dataset.autofill='';
+    }
+  }
+});
+document.addEventListener('change',function(e){
+  var inp=e.target;
+  if(inp.matches&&inp.matches('#tbody td.edit input')&&DATE_COLS.indexOf(+inp.dataset.col)>=0){ strictDate(inp); inp.dataset.autofill=''; }
+});
+document.addEventListener('focusout',function(e){
+  var inp=e.target;
+  if(inp.matches&&inp.matches('#tbody td.edit input')&&DATE_COLS.indexOf(+inp.dataset.col)>=0){
+    if(inp.dataset.autofill==='1'){
+      inp.value='';
+      inp.dataset.autofill='';
+    } else if(isValidDateStr(inp.value)){
+      inp.closest('td').classList.add('filled');
+      inp.dispatchEvent(new Event('input',{bubbles:true}));
+    } else {
+      inp.value='';
+      inp.closest('td').classList.remove('filled');
+    }
+  }
+  if(inp.matches&&(inp.matches('#tbody td.edit input')||inp.matches('#tbody select')||inp.matches('#tbody td.edit.note textarea'))){
+    var v=String(inp.value||'').trim();
+    if(v!==''&&v!=='00.00.0000') inp.closest('td').classList.add('filled');
+    else inp.closest('td').classList.remove('filled');
+    updSaveBtn();
+  }
+});
+var DATE_COLS=[11,17,19,21,22];
+function isValidDateStr(s){
+  var m=String(s).match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if(!m) return false;
+  var d=+m[1],mo=+m[2],y=+m[3];
+  var yMax=new Date().getFullYear()+1;
+  if(y<2024||y>yMax||mo<1||mo>12||d<1) return false;
+  var dt=new Date(y,mo-1,d);
+  return dt.getFullYear()===y&&dt.getMonth()===mo-1&&dt.getDate()===d;
+}
+function strictDate(inp){
+  var tokens=String(inp.value).split(/\s+/).filter(Boolean);
+  var ok=tokens.filter(function(t){
+    var m=t.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+    if(!m) return false;
+    var d=+m[1],mo=+m[2],y=+m[3];
+  var yMax=new Date().getFullYear()+1;
+  if(y<2024||y>yMax||mo<1||mo>12||d<1) return false;
+    var dt=new Date(y,mo-1,d);
+    return dt.getFullYear()===y&&dt.getMonth()===mo-1&&dt.getDate()===d;
+  });
+  inp.value=ok.length?ok.join(' '):'';
+  if(!ok.length) inp.dispatchEvent(new Event('input',{bubbles:true}));
+}
+function sanitizeNum(inp, strict){
+  if(!strict){
+    var v2=String(inp.value).replace(/[^\d.,]/g,'');
+    if(v2!==inp.value) inp.value=v2;
+    return;
+  }
+  var m=String(inp.value).replace(/\s/g,'').match(/\d+(?:[.,]\d+)?/);
+  if(!m){ inp.value=''; return; }
+  var v=m[0].replace(',','.');
+  if(String(inp.value)!==v) inp.value=v;
+}
+function sanitizePct(inp, strict){
+  if(!strict){
+    var v2=String(inp.value).replace(/[^\d.,%]/g,'');
+    if(v2!==inp.value) inp.value=v2;
+    return;
+  }
+  var m=String(inp.value).match(/-?\d+(?:[.,]\d+)?/);
+  if(!m){ inp.value=''; return; }
+  var n=parseFloat(m[0].replace(',','.'));
+  if(n>100) n=100;
+  if(n<0) n=0;
+  var disp=(Math.round(n*10)/10).toString().replace('.',',')+'%';
+  if(inp.value!==disp) inp.value=disp;
+}
+function collectVals(){
+  var inputs=document.querySelectorAll('#tbody input,#tbody textarea,#tbody select');
+  var vals=MASTER.filter(function(r){return r[0]==selObj.value})[0].slice(0,24);
+  inputs.forEach(function(inp){
+    var c=+inp.dataset.col;
+    if(DATE_COLS.indexOf(c)>=0&&inp.value==='00.00.0000'){ vals[c]=''; return; }
+    if(DATE_COLS.indexOf(c)>=0&&inp.dataset.autofill==='1'){ vals[c]=''; return; }
+    vals[c]=(PCT_COLS.indexOf(c)>=0)?pctRaw(inp.value):inp.value;
+  });
+  return vals;
+}
+document.getElementById('btnXls').addEventListener('click',function(){
+  window.__saved=(window.__saved||0)+1;
+  var t='<table border="1" style="border-collapse:collapse;font-family:Arial;font-size:10pt">';
+  t+='<tr>'; HEAD1.forEach(function(h){ t+='<th colspan="'+h[1]+'" style="background:#dbe4ee">'+esc(h[0])+'</th>'; }); t+='</tr><tr>';
+  for(var c=0;c<24;c++){ var h=HEAD2[c]; t+='<th style="background:#eef1f7">'+(h==null?'':esc(h))+'</th>'; }
+  t+='</tr>';
+  var vals=collectVals();
+  var filler=document.getElementById('inpFiller').value.trim();
+  t+='<tr><td colspan="24" style="border:none;height:30px"></td></tr>';
+  t+='<tr><td colspan="24" style="border:none;font-size:10pt"><b>Заполнившее лицо медицинской организации (ФИО и должность):</b> '+esc(filler||'—')+'</td></tr>';
+  t+='<tr>';
+  vals.forEach(function(v,i){
+    var st=(PCT_COLS.indexOf(i)>=0&&/^[\d.,]+$/.test(String(v)))?' style="mso-number-format:0%"':'';
+    t+='<td'+st+'>'+esc(v)+'</td>';
+  });
+  t+='</tr>';
+  t+='</table>';
+  var html='<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8"></head><body>'+t+'</body></html>';
+  var blob=new Blob(['\ufeff'+html],{type:'application/vnd.ms-excel'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='Еженедельный_мониторинг_ТМО_Новые_'+selOrg.value.substring(0,40).replace(/[\\\/:*?"<>|]/g,'')+'.xls';
+  document.body.appendChild(a); a.click(); a.remove();
+  // загрузка копии отчёта в репозиторий GitHub через промежуточный сервер
+  var PROXY='https://anketa-proxy.artur-nabiullin.workers.dev/';
+  var fr=new FileReader();
+  fr.onload=function(){
+    var b64=fr.result.split(',')[1];
+    var stamp=new Date();
+    function p2(x){return (x<10?'0':'')+x;}
+    var lat={'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'e','ж':'zh','з':'z','и':'i','й':'j','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'c','ч':'ch','ш':'sh','щ':'sch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya'};
+    function tr(s){return s.toLowerCase().split('').map(function(ch){return lat[ch]!==undefined?lat[ch]:ch;}).join('');}
+    var fname='tmo_nov_'+tr(selOrg.value).substring(0,55).replace(/[^A-Za-z0-9_.\- ()]/g,'')+'_'+p2(stamp.getDate())+'.'+p2(stamp.getMonth()+1)+'.'+stamp.getFullYear()+'_'+p2(stamp.getHours())+'-'+p2(stamp.getMinutes())+'-'+p2(stamp.getSeconds())+'.xls';
+    fetch(PROXY,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({filename:fname,content:b64})
+    }).then(function(r){if(!r.ok)console.warn('Отчёт в репозиторий не загружен',r.status);});
+  };
+  fr.readAsDataURL(blob);
+});
+document.getElementById('btnClear').addEventListener('click',function(){
+  if(!confirm('Очистить форму?'))return;
+  selObj.value=''; selOrg.value='';
+  document.getElementById('inpFiller').value='';
+  hideTable();
+});
+document.getElementById('inpFiller').addEventListener('input',updSaveBtn);
+</script>
+</body>
+</html>
